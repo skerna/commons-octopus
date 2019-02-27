@@ -1,0 +1,25 @@
+{
+  "name": "$scope_npm_package/$project.name",
+  "version": "$version",
+  "description": "Dtos",
+  "main": "kotlinx-atomicfu.js",
+  "author": "R2B",
+  "license": "Apache-2.0",
+  "homepage": "https://gitlab.com/r2b/olibs/klab",
+  "bugs": {
+    "url": "https://gitlab.com/r2b/olibs/klab/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/r2b/olibs/klab.git"
+  },
+  "keywords": [
+    "R2B",
+    "KLAB-SHARED"
+  ],
+  "peerDependencies": {
+    $kotlinDependency
+  },
+  "dependencies": {
+  }
+}
