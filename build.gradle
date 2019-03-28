@@ -43,8 +43,8 @@ kotlin {
                 implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core-common:$kotlinCoroutinesVersion"
                 api "org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:$kotlinSerialization"
                 api "io.ktor:ktor-client-core:$ktorClientVersion"
-                api "io.skerna.libs:skerna-sfutures-metadata:$skernaVersion"
-                api "io.skerna.libs:skerna-slog-metadata:$skernaVersion"
+                api "io.skerna.commons:skerna-sreaction-metadata:$skernaVersion"
+                api "io.skerna.commons:skerna-logger-metadata:$skernaVersion"
 
             }
         }
@@ -62,8 +62,8 @@ kotlin {
                 api "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$kotlinSerialization"
                 api "io.ktor:ktor-client-core-jvm:$ktorClientVersion"
                 api "io.ktor:ktor-client-okhttp:$ktorClientVersion"
-                api "io.skerna.libs:skerna-sfutures-jvm:$skernaVersion"
-                api "io.skerna.libs:skerna-slog-jvm:$skernaVersion"
+                api "io.skerna.commons:skerna-sreaction-jvm:$skernaVersion"
+                api "io.skerna.commons:skerna-logger-jvm:$skernaVersion"
             }
         }
         jvmTest {
@@ -78,8 +78,8 @@ kotlin {
                 implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core-js:$kotlinCoroutinesVersion"
                 api "org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:$kotlinSerialization"
                 api "io.ktor:ktor-client-core-js:$ktorClientVersion"
-                api "io.skerna.libs:skerna-sfutures-js:$skernaVersion"
-                api "io.skerna.libs:skerna-slog-js:$skernaVersion"
+                api "io.skerna.commons:skerna-sreaction-js:$skernaVersion"
+                api "io.skerna.commons:skerna-logger-js:$skernaVersion"
             }
         }
         jsTest {
