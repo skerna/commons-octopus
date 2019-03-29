@@ -14,3 +14,21 @@ pluginManagement {
         }
     }
 }
+
+def isUncluded = gradle.parent != null
+if(isUncluded) {
+    includeBuild("../skerna-logger"){
+        dependencySubstitution {
+            substitute module('io.skerna.commons:skerna-logger-metadata') with project(':')
+            substitute module('io.skerna.commons:skerna-logger-jvm') with project(':')
+            substitute module('io.skerna.commons:skerna-logger-js') with project(':')
+        }
+    }
+    includeBuild("../skerna-sreaction"){
+        dependencySubstitution {
+            substitute module('io.skerna.commons:skerna-sreaction-metadata') with project(':')
+            substitute module('io.skerna.commons:skerna-sreaction-jvm') with project(':')
+            substitute module('io.skerna.commons:skerna-sreaction-js') with project(':')
+        }
+    }
+}
