@@ -17,18 +17,18 @@ pluginManagement {
 
 def isUncluded = gradle.parent != null
 if(isUncluded) {
-    includeBuild("../skerna-logger"){
+    includeBuild("../commons-logger"){
         dependencySubstitution {
-            substitute module('io.skerna.commons:skerna-logger-metadata') with project(':')
-            substitute module('io.skerna.commons:skerna-logger-jvm') with project(':')
-            substitute module('io.skerna.commons:skerna-logger-js') with project(':')
+            substitute module('io.skerna.commons:commons-logger-metadata') with project(':')
+            substitute module('io.skerna.commons:commons-logger-jvm') with project(':')
+            substitute module('io.skerna.commons:commons-logger-js') with project(':')
         }
     }
-    includeBuild("../skerna-sreaction"){
+    includeBuild("../commons-sreaction"){
         dependencySubstitution {
-            substitute module('io.skerna.commons:skerna-sreaction-metadata') with project(':')
-            substitute module('io.skerna.commons:skerna-sreaction-jvm') with project(':')
-            substitute module('io.skerna.commons:skerna-sreaction-js') with project(':')
+            substitute module('io.skerna.commons:commons-sreaction-metadata') with project(':')
+            substitute module('io.skerna.commons:commons-sreaction-jvm') with project(':')
+            substitute module('io.skerna.commons:commons-sreaction-js') with project(':')
         }
     }
 }

@@ -14,13 +14,6 @@ repositories{
     maven { url "https://kotlin.bintray.com/kotlinx" }
     maven { url "https://kotlin.bintray.com/kotlin-dev" }
     maven { url "https://kotlin.bintray.com/js-externals" }
-    maven {
-        url 'http://35.237.246.198/artifactory/libs-snapshot'
-        credentials {
-            username = "${artifactory_user}"
-            password = "${artifactory_password}"
-        }
-    }
 }
 kotlin {
     jvm {
@@ -43,8 +36,8 @@ kotlin {
                 implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core-common:$kotlinCoroutinesVersion"
                 api "org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:$kotlinSerialization"
                 api "io.ktor:ktor-client-core:$ktorClientVersion"
-                api "io.skerna.commons:skerna-sreaction-metadata:$skernaVersion"
-                api "io.skerna.commons:skerna-logger-metadata:$skernaVersion"
+                api "io.skerna.commons:commons-sreaction-metadata:$skernaVersion"
+                api "io.skerna.commons:commons-logger-metadata:$skernaVersion"
 
             }
         }
@@ -62,8 +55,8 @@ kotlin {
                 api "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$kotlinSerialization"
                 api "io.ktor:ktor-client-core-jvm:$ktorClientVersion"
                 api "io.ktor:ktor-client-okhttp:$ktorClientVersion"
-                api "io.skerna.commons:skerna-sreaction-jvm:$skernaVersion"
-                api "io.skerna.commons:skerna-logger-jvm:$skernaVersion"
+                api "io.skerna.commons:commons-sreaction-jvm:$skernaVersion"
+                api "io.skerna.commons:commons-logger-jvm:$skernaVersion"
             }
         }
         jvmTest {
@@ -78,8 +71,8 @@ kotlin {
                 implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core-js:$kotlinCoroutinesVersion"
                 api "org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:$kotlinSerialization"
                 api "io.ktor:ktor-client-core-js:$ktorClientVersion"
-                api "io.skerna.commons:skerna-sreaction-js:$skernaVersion"
-                api "io.skerna.commons:skerna-logger-js:$skernaVersion"
+                api "io.skerna.commons:commons-sreaction-js:$skernaVersion"
+                api "io.skerna.commons:commons-logger-js:$skernaVersion"
             }
         }
         jsTest {
