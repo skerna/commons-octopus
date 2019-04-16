@@ -1,6 +1,8 @@
 plugins {
     id 'kotlin-multiplatform'
     id 'kotlinx-serialization'
+    id "com.jfrog.bintray" version "1.8.4"
+
 }
 
 apply plugin: 'maven-publish'
@@ -14,7 +16,7 @@ repositories{
     maven { url "https://kotlin.bintray.com/kotlinx" }
     maven { url "https://kotlin.bintray.com/kotlin-dev" }
     maven { url "https://kotlin.bintray.com/js-externals" }
-    maven { url "https://jitpack.io" }
+    maven { url  "https://dl.bintray.com/skerna/maven" }
 }
 kotlin {
     jvm {
@@ -37,8 +39,8 @@ kotlin {
                 implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core-common:$kotlinCoroutinesVersion"
                 api "org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:$kotlinSerialization"
                 api "io.ktor:ktor-client-core:$ktorClientVersion"
-                api "com.gitlab.skerna.libs:commons-sreaction-metadata:$skernaVersion"
-                api "com.gitlab.skerna.libs:commons-logger-metadata:$skernaVersion"
+                api "io.skerna.libs:commons-sreaction-metadata:$skernaVersion"
+                api "io.skerna.libs:commons-logger-metadata:$skernaVersion"
 
             }
         }
@@ -56,8 +58,8 @@ kotlin {
                 api "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$kotlinSerialization"
                 api "io.ktor:ktor-client-core-jvm:$ktorClientVersion"
                 api "io.ktor:ktor-client-okhttp:$ktorClientVersion"
-                api "com.gitlab.skerna.libs:commons-sreaction-jvm:$skernaVersion"
-                api "com.gitlab.skerna.libs:commons-logger-jvm:$skernaVersion"
+                api "io.skerna.libs:commons-sreaction-jvm:$skernaVersion"
+                api "io.skerna.libs:commons-logger-jvm:$skernaVersion"
             }
         }
         jvmTest {
@@ -72,8 +74,8 @@ kotlin {
                 implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core-js:$kotlinCoroutinesVersion"
                 api "org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:$kotlinSerialization"
                 api "io.ktor:ktor-client-core-js:$ktorClientVersion"
-                api "com.gitlab.skerna.libs:commons-sreaction-js:$skernaVersion"
-                api "com.gitlab.skerna.libs:commons-logger-js:$skernaVersion"
+                api "io.skerna.libs:commons-sreaction-js:$skernaVersion"
+                api "io.skerna.libs:commons-logger-js:$skernaVersion"
             }
         }
         jsTest {
@@ -96,3 +98,4 @@ compileTestKotlinJs {
     kotlinOptions.moduleKind = 'umd'
     kotlinOptions.sourceMapEmbedSources = 'always'
 }
+apply from: "./gradle/publish.gradle"
