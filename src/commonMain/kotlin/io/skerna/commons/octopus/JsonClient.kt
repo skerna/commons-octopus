@@ -35,9 +35,8 @@ class JsonClient: Preaction {
      * @param httpRequestBuilder
      * @return io.skerna.commons.sreaction.Reaction<Boolean>
      */
-    override fun apply(context: PreactionContext): Reaction<Boolean> {
+    override suspend fun apply(context: PreactionContext){
         context.request.contentType(ContentType.Application.Json)
-        return Reaction.succeededReact(true)
     }
 
 

@@ -24,7 +24,7 @@ package io.skerna.commons.octopus
 
 import io.ktor.client.request.HttpRequestBuilder
 import io.skerna.commons.sreaction.Reaction
-import io.skerna.octopus.impl.DefaultApiBuilder
+import io.skerna.commons.octopus.impl.DefaultApiBuilder
 import kotlin.js.JsName
 
 
@@ -35,7 +35,10 @@ interface Api{
     @JsName("call")
     fun call(requestBuilder: HttpRequestBuilder): Reaction<String>
 
-    @JsName("callWithAdapter")
+    @JsName("callWithRequestAdapter")
+    fun<T> call(customCaller:CustomCall<T>): Reaction<T>
+
+    @JsName("callWithResponseAdapter")
     fun<T> callWithAdapter(requestBuilder: HttpRequestBuilder,adapter:(String) -> T): Reaction<T>
 
     companion object {

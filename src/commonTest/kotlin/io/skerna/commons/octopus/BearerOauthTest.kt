@@ -20,18 +20,29 @@
  * SOFTWARE.
  */
 
-import io.skerna.commons.octopus.runBlocking
+import io.ktor.client.request.HttpRequestBuilder
+import io.skerna.commons.octopus.*
+import io.skerna.commons.octopus.impl.DefaultApi
+import io.skerna.commons.octopus.impl.DefaultClientFactory
+import io.skerna.commons.sreaction.asCoroutine
 import kotlin.test.Test
+import kotlin.test.assertTrue
 
 open class BearerOauthTest:BaseTest() {
 
     @Test
     fun resolveToken() = runBlocking {
-/**
-        val preaction = BearerOauth("it3AC9dpU1btYrFa6kR6E2tch8224UwL","73K59up7996HKL4JFXrxY97xJL7paktx")
-        val httpRequestBuilder = HttpRequestBuilder()
-        val react = preaction.apply(httpRequestBuilder).asCoroutine()
-        println("LLegue aqui")
-        assertTrue(react,"Se esperaba una respuesta ok")**/
+        val apiConfig = ApiConfig()
+                .setServerUrlOauth2("192.168.1.33")
+                .setServerPortOauth2(80)
+
+        val auth = BearerOauth("069f0Vf1tMwU498Au6WC44RMs83axXC6","P718v53swJa8VjwvvQhaYe8WpJF6H8c1")
+        val client = DefaultApi(apiConfig, listOf(auth),DefaultClientFactory(apiConfig))
+
+        client.call(CustomCall {
+            println(it)
+        }).asCoroutine()
+
+
     }
 }

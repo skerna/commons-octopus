@@ -85,6 +85,13 @@ kotlin {
         }
     }
 }
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        apiVersion = "1.3"
+        languageVersion = "1.3"
+        jvmTarget = "1.8"
+    }
+}
 
 compileKotlinJs {
     kotlinOptions.metaInfo = true
@@ -99,3 +106,4 @@ compileTestKotlinJs {
     kotlinOptions.sourceMapEmbedSources = 'always'
 }
 apply from: "./gradle/publish.gradle"
+

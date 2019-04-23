@@ -28,14 +28,10 @@ import io.ktor.client.request.forms.FormDataContent
 import io.ktor.http.HttpMethod
 import io.ktor.http.Parameters
 import io.ktor.http.isSuccess
-import io.skerna.commons.sreaction.Reaction
-import io.skerna.commons.sreaction.asReactionBoolean
+import io.skerna.commons.logger.LoggerFactory
 import io.skerna.commons.octopus.representations.OAuth2Token
 import io.skerna.commons.octopus.utils.Base64
 import io.skerna.commons.octopus.utils.Dates
-import io.skerna.commons.logger.LoggerFactory
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.io.readRemaining
 import kotlinx.serialization.json.JSON
 
@@ -52,20 +48,20 @@ class BearerOauth(val tokenEncoded: String) : Preaction {
      * a los servidores
      * @param httpRequestBuilder
      */
-    override fun apply(context: PreactionContext): Reaction<Boolean> {
+    override suspend fun apply(context: PreactionContext) {
         log.debug("Aplicando request interceptor ${this::class.simpleName}")
         log.debug("Current Token is $currentToken")
-        return GlobalScope.async {
-            val token = resolveToken(context)
-            bindTokenToRequest(context.request,token)
-        }.asReactionBoolean()
+        println("TOAKEN ")
+        val token = resolveToken(context)
+        println("++>>> " + token)
+        bindTokenToRequest(context.request, token)
     }
 
     /**
      * Añade el token a las cabeceras de la petción
      * @param requestBuilder
      */
-    private fun bindTokenToRequest(requestBuilder: HttpRequestBuilder,token: OAuth2Token) {
+    private fun bindTokenToRequest(requestBuilder: HttpRequestBuilder, token: OAuth2Token) {
         log.debug("Bind token to request $token")
         if (this.currentToken == null) {
             throw IllegalStateException("Token no resuelto")
@@ -106,7 +102,7 @@ class BearerOauth(val tokenEncoded: String) : Preaction {
             path("auth/realms/${apiConfig.contextAuth}/protocol/openid-connect/token")
         }
 
-        log.debug("Request token to ${apiConfig.contextAuth} using server ${apiConfig.serverUrl}:${apiConfig.serverPort}")
+        log.debug("Request token to ${apiConfig.contextAuth} using server ${apiConfig.serverUrlOauth}:${apiConfig.serverPortOauth}")
         request.method = HttpMethod.Post
         request.body = FormDataContent(Parameters.build {
             append("grant_type", "client_credentials")
@@ -122,18 +118,19 @@ class BearerOauth(val tokenEncoded: String) : Preaction {
         log.debug("Status response request token $status")
 
         if (!status.isSuccess()) {
-            val message ="Server response with not success code $status, content [$content]"
+            val message = "Server response with not success code $status, content [$content]"
             log.error(message)
-            throw ApiCallException(message,request,response)
+            throw ApiCallException(message, request, response)
         }
         return JSON.parse(OAuth2Token.serializer(), content)
     }
 
-    private fun currentTokenIsValid():Boolean{
-        if(this.currentToken == null){
+    private fun currentTokenIsValid(): Boolean {
+        if (this.currentToken == null) {
             return true
-        }else return !currentTokenIsExpired()
+        } else return !currentTokenIsExpired()
     }
+
     private fun currentTokenIsExpired(): Boolean {
         if (this.currentToken == null) {
             return true

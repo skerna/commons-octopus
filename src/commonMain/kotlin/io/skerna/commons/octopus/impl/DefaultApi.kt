@@ -38,7 +38,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.io.readRemaining
 
 
-internal class DefaultApi(private val apiConfig: ApiConfig,
+open class DefaultApi(private val apiConfig: ApiConfig,
                           private val listPreactions: List<Preaction>,
                           private val defaultClientFactory: ClientFactory) : Api {
     val logger = LoggerFactory.logger<DefaultApi>()
@@ -53,15 +53,33 @@ internal class DefaultApi(private val apiConfig: ApiConfig,
     }
 
     /**
+     * Apply request builder
+     * @param requestBuilder
+     * @return HttpRequestBuilder
+     */
+    open suspend fun applyPreactions(requestBuilder: HttpRequestBuilder):HttpRequestBuilder{
+        val contextRequest = PreactionContext(requestBuilder,apiConfig,client)
+        println("Applicando total de preactions " + listPreactions.size)
+        for (configuration in listPreactions) {
+            configuration.apply(contextRequest)
+        }
+        return requestBuilder
+    }
+
+    open fun buildBaseRequest():HttpRequestBuilder{
+        val request  = HttpRequestBuilder()
+        return request
+    }
+
+
+
+    /**
      * Ejecuta una petición a la Api usando un adaptador
      */
     @ExperimentalCoroutinesApi
     override fun call(requestBuilder: HttpRequestBuilder): Reaction<String> = GlobalScope.async {
             getTargetHost(requestBuilder)
-            val contextRequest = PreactionContext(requestBuilder,apiConfig,client)
-            for (configuration in listPreactions) {
-                configuration.apply(contextRequest).asCoroutine()
-            }
+            applyPreactions(requestBuilder)
             // Setup global config to request
             requestBuilder.port = apiConfig.serverPort
 
@@ -79,6 +97,14 @@ internal class DefaultApi(private val apiConfig: ApiConfig,
         content
 
         }.asReaction()
+
+    override fun <T> call(customCaller: CustomCall<T>):  Reaction<T> = GlobalScope.async{
+        val baserequest = buildBaseRequest()
+        applyPreactions(baserequest)
+        val result = customCaller.call(baserequest)
+        result
+    }.asReaction()
+
 
 
     /**

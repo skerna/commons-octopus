@@ -40,8 +40,7 @@ class BearerAuth(private val token:String): Preaction {
      * @param httpRequestBuilder
      * @return io.skerna.commons.sreaction.Reaction<Boolean>
      */
-    override fun apply(context: PreactionContext): Reaction<Boolean> {
+    override suspend fun apply(context: PreactionContext){
         context.request.headers.append("Authorization","Bearer $token")
-        return Reaction.succeededReact(true)
     }
 }

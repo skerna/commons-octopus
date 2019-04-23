@@ -44,5 +44,5 @@ interface Preaction{
      * @return io.skerna.commons.sreaction.Reaction<Boolean>
      */
     @JsName("apply")
-    fun apply(context: PreactionContext): Reaction<Boolean>
+    suspend fun apply(context: PreactionContext)
 }

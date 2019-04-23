@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package io.skerna.octopus.impl
+package io.skerna.commons.octopus.impl
 
 import io.skerna.commons.octopus.*
 import io.skerna.commons.octopus.impl.DefaultApi
