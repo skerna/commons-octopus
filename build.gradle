@@ -1,3 +1,23 @@
+buildscript {
+
+    repositories {
+        jcenter()
+        mavenCentral()
+        google()
+        maven { url 'http://oss.sonatype.org/content/repositories/snapshots' }
+        maven { url "https://plugins.gradle.org/m2/" }
+        maven { url "https://kotlin.bintray.com/kotlinx/" }
+        maven { url 'https://jitpack.io' }
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.4.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion"
+        classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlinVersion"
+    }
+}
+
 plugins {
     id 'kotlin-multiplatform'
     id 'kotlinx-serialization'
@@ -85,13 +105,7 @@ kotlin {
         }
     }
 }
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
-    kotlinOptions {
-        apiVersion = "1.3"
-        languageVersion = "1.3"
-        jvmTarget = "1.8"
-    }
-}
+
 
 compileKotlinJs {
     kotlinOptions.metaInfo = true

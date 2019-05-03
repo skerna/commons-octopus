@@ -61,7 +61,13 @@ open class DefaultApi(private val apiConfig: ApiConfig,
         val contextRequest = PreactionContext(requestBuilder,apiConfig,client)
         println("Applicando total de preactions " + listPreactions.size)
         for (configuration in listPreactions) {
-            configuration.apply(contextRequest)
+            try {
+                configuration.apply(contextRequest)
+            }
+            catch(e:Exception) {
+                logger.error("Error on apply preaction",e)
+                throw ApiCallException("Preaction application end with error code",e)
+            }
         }
         return requestBuilder
     }
@@ -77,45 +83,37 @@ open class DefaultApi(private val apiConfig: ApiConfig,
      * Ejecuta una petición a la Api usando un adaptador
      */
     @ExperimentalCoroutinesApi
-    override fun call(requestBuilder: HttpRequestBuilder): Reaction<String> = GlobalScope.async {
-            getTargetHost(requestBuilder)
-            applyPreactions(requestBuilder)
-            // Setup global config to request
-            requestBuilder.port = apiConfig.serverPort
+    override suspend fun call(requestBuilder: HttpRequestBuilder): String {
+        getTargetHost(requestBuilder)
+        applyPreactions(requestBuilder)
+        // Setup global config to request
+        requestBuilder.port = apiConfig.serverPort
 
-            val resultCall = client.call(requestBuilder)
-            val response = resultCall.response
-            val status = response.status
-            val packet = response.content.readRemaining(Long.MAX_VALUE)
+        val resultCall = client.call(requestBuilder)
+        val response = resultCall.response
+        val status = response.status
+        val packet = response.content.readRemaining(Long.MAX_VALUE)
 
-            val content = packet.readText()
-            if (!status.isSuccess()) {
-                println("================================")
-                println(response.call.request.url.fullPath)
-                throw ApiCallException("Call api ended with code ${status.value}, content: ${status.description} ${content}")
-            }
-        content
+        val content = packet.readText()
+        if (!status.isSuccess()) {
+            println("================================")
+            println(response.call.request.url.fullPath)
+            throw ApiCallException("Call api ended with code ${status.value}, content: ${status.description} ${content}")
+        }
+        return content
+    }
 
-        }.asReaction()
 
-    override fun <T> call(customCaller: CustomCall<T>):  Reaction<T> = GlobalScope.async{
+    override suspend fun <T> call(customCaller: CustomCall<T>): T{
         val baserequest = buildBaseRequest()
         applyPreactions(baserequest)
         val result = customCaller.call(baserequest)
-        result
-    }.asReaction()
+        return result
+    }
 
 
-
-    /**
-     * Ejecuta una petición usando un adaptador para transformar la respuesta del servidor
-     * @param adapter
-     * @param requestBuilder
-     * @return Reaction<T>
-     */
-    override fun <T> callWithAdapter(requestBuilder: HttpRequestBuilder, adapter: (String) -> T): Reaction<T> {
-        val result = call(requestBuilder)
-        return result.map(adapter)
+    override fun getApiConfig(): ApiConfig {
+        return apiConfig
     }
 
     override fun toString(): String {

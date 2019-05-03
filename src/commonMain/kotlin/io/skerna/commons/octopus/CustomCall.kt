@@ -13,7 +13,7 @@ interface CustomCall<T>{
  * Creates [Runnable] task instance.
  */
 @Suppress("FunctionName")
-public  inline fun<T> CustomCall(crossinline block: (requestBuilder: HttpRequestBuilder) -> T): CustomCall<T>{
+public fun<T> CustomCall( block: (requestBuilder: HttpRequestBuilder) -> T): CustomCall<T>{
     return object:CustomCall<T>{
         override fun call(requestBuilder: HttpRequestBuilder): T {
             return block(requestBuilder)

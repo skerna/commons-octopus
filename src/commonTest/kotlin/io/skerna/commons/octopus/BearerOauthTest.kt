@@ -28,6 +28,7 @@ import io.skerna.commons.sreaction.asCoroutine
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
+
 open class BearerOauthTest:BaseTest() {
 
     @Test

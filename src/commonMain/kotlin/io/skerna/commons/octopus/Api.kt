@@ -33,13 +33,12 @@ interface Api{
      * Ejecuta una petición a la Api usando un adaptador
      */
     @JsName("call")
-    fun call(requestBuilder: HttpRequestBuilder): Reaction<String>
+    suspend fun call(requestBuilder: HttpRequestBuilder): String
 
     @JsName("callWithRequestAdapter")
-    fun<T> call(customCaller:CustomCall<T>): Reaction<T>
+    suspend fun<T> call(customCaller:CustomCall<T>): T
 
-    @JsName("callWithResponseAdapter")
-    fun<T> callWithAdapter(requestBuilder: HttpRequestBuilder,adapter:(String) -> T): Reaction<T>
+    fun getApiConfig():ApiConfig
 
     companion object {
         @JsName("create")

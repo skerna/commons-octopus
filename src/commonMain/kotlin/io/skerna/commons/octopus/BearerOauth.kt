@@ -51,9 +51,7 @@ class BearerOauth(val tokenEncoded: String) : Preaction {
     override suspend fun apply(context: PreactionContext) {
         log.debug("Aplicando request interceptor ${this::class.simpleName}")
         log.debug("Current Token is $currentToken")
-        println("TOAKEN ")
         val token = resolveToken(context)
-        println("++>>> " + token)
         bindTokenToRequest(context.request, token)
     }
 
