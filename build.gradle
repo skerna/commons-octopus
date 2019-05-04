@@ -24,9 +24,57 @@ plugins {
     id "com.jfrog.bintray" version "1.8.4"
 
 }
-
+apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+    sourceSets {
+        test.java.srcDirs += 'src/test/kotlin'
+        androidTest.java.srcDirs += 'src/androidTest/kotlin'
+    }
+}
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion"
+    api "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$kotlinSerialization"
+    api "io.ktor:ktor-client-android:$ktorClientVersion"
+    api "io.skerna.libs:commons-sreaction-jvm:$skernaVersion"
+    api "io.skerna.libs:commons-logger-jvm:$skernaVersion"
+
+
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
+    testImplementation("androidx.test:core:1.1.0")
+    testImplementation("androidx.test:runner:1.1.0")
+    testImplementation("androidx.test.ext:junit:1.0.0")
+    testImplementation("androidx.test.espresso:espresso-intents:3.1.0")
+    testImplementation("androidx.test.espresso:espresso-core:3.1.0")
+    testImplementation("androidx.test.ext:truth:1.0.0")
+    testImplementation ("org.robolectric:robolectric:4.0")
+}
+configurations {
+    compileClasspath
+}
 
 repositories{
     mavenLocal()
@@ -47,12 +95,15 @@ kotlin {
     targets {
         fromPreset(presets.jvm, 'jvm')
         fromPreset(presets.js, 'js')
+        fromPreset(presets.jvm, 'android')
+
         // For ARM, preset should be changed to presets.iosArm32 or presets.iosArm64
         // For Linux, preset should be changed to e.g. presets.linuxX64
         // For MacOS, preset should be changed to e.g. presets.macosX64
         //fromPreset(presets.linuxX64, 'linux')
     }
     sourceSets {
+
         commonMain {
             dependencies {
                 implementation "org.jetbrains.kotlin:kotlin-stdlib-common"
@@ -101,6 +152,25 @@ kotlin {
         jsTest {
             dependencies {
                 implementation 'org.jetbrains.kotlin:kotlin-test-js'
+            }
+        }
+        androidMain {
+            dependencies{
+                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion"
+                api "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$kotlinSerialization"
+                api "io.ktor:ktor-client-core-jvm:$ktorClientVersion"
+                api "io.ktor:ktor-client-android:$ktorClientVersion"
+                api "io.skerna.libs:commons-sreaction-jvm:$skernaVersion"
+                api "io.skerna.libs:commons-logger-jvm:$skernaVersion"
+
+            }
+        }
+        androidTest {
+            dependencies {
+                implementation 'org.jetbrains.kotlin:kotlin-test'
+                implementation 'org.jetbrains.kotlin:kotlin-test-junit'
+                implementation 'org.mockito:mockito-core:2.7.22'
+                implementation 'org.mockito:mockito-android:2.7.22'
             }
         }
     }

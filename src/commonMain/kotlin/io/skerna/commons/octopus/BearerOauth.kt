@@ -94,13 +94,14 @@ class BearerOauth(val tokenEncoded: String) : Preaction {
         val httpClient = context.httpClient
 
         val request = HttpRequestBuilder()
+        val oauthPaht = "auth/realms/${apiConfig.contextAuth}/protocol/openid-connect/token"
         request.url {
             host = apiConfig.serverUrlOauth
             port = apiConfig.serverPortOauth
-            path("auth/realms/${apiConfig.contextAuth}/protocol/openid-connect/token")
+            path(oauthPaht)
         }
 
-        log.debug("Request token to ${apiConfig.contextAuth} using server ${apiConfig.serverUrlOauth}:${apiConfig.serverPortOauth}")
+        log.debug("Request token to ${apiConfig.contextAuth} using server ${apiConfig.serverUrlOauth}:${apiConfig.serverPortOauth} path => $oauthPaht")
         request.method = HttpMethod.Post
         request.body = FormDataContent(Parameters.build {
             append("grant_type", "client_credentials")

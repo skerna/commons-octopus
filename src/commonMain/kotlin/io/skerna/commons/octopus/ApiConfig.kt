@@ -74,5 +74,9 @@ class ApiConfig{
         this.serverPortOauth = port
     }
 
+    override fun toString(): String {
+        return "ApiConfig(enableLoggin=$enableLoggin, serverPort=$serverPort, serverUrl='$serverUrl', contextAuth='$contextAuth', serverUrlOauth='$serverUrlOauth', serverPortOauth=$serverPortOauth)"
+    }
+
 
 }
