@@ -43,9 +43,9 @@ interface Api{
 
     fun addCallHandler(handler:CallHandler)
 
+    fun addCallHandlers(set: Set<CallHandler>)
 
     fun removeCallHandler(handler: CallHandler)
-
 
     fun getHandlers():Set<CallHandler>
 

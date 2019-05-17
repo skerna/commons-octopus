@@ -156,6 +156,10 @@ open class DefaultApi(private val apiConfig: ApiConfig,
         handlers.add(handler)
     }
 
+    override fun addCallHandlers(set: Set<CallHandler>) {
+        this.handlers.addAll(set)
+    }
+
     override fun removeCallHandler(handler: CallHandler) {
         handlers.remove(handler)
     }
