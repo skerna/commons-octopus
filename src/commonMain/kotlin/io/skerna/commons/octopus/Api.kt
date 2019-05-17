@@ -23,6 +23,7 @@
 package io.skerna.commons.octopus
 
 import io.ktor.client.request.HttpRequestBuilder
+import io.skerna.commons.octopus.handlers.CallHandler
 import io.skerna.commons.sreaction.Reaction
 import io.skerna.commons.octopus.impl.DefaultApiBuilder
 import kotlin.js.JsName
@@ -39,6 +40,15 @@ interface Api{
     suspend fun<T> call(customCaller:CustomCall<T>): T
 
     fun getApiConfig():ApiConfig
+
+    fun addCallHandler(handler:CallHandler)
+
+
+    fun removeCallHandler(handler: CallHandler)
+
+
+    fun getHandlers():Set<CallHandler>
+
 
     companion object {
         @JsName("create")

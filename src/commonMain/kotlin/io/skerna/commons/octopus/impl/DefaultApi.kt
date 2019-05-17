@@ -32,6 +32,7 @@ import io.skerna.commons.sreaction.asCoroutine
 import io.skerna.commons.sreaction.asReaction
 import io.skerna.commons.logger.LoggerFactory
 import io.skerna.commons.octopus.*
+import io.skerna.commons.octopus.handlers.CallHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -42,8 +43,8 @@ open class DefaultApi(private val apiConfig: ApiConfig,
                           private val listPreactions: List<Preaction>,
                           private val defaultClientFactory: ClientFactory) : Api {
     val logger = LoggerFactory.logger<DefaultApi>()
-
     val client by lazy { defaultClientFactory.create() }
+    val handlers:MutableSet<CallHandler> by lazy { mutableSetOf<CallHandler>() }
 
     private fun getTargetHost(requestBuilder: HttpRequestBuilder) {
         var host = apiConfig.serverUrl.removeSuffix("/")
@@ -84,36 +85,83 @@ open class DefaultApi(private val apiConfig: ApiConfig,
      */
     @ExperimentalCoroutinesApi
     override suspend fun call(requestBuilder: HttpRequestBuilder): String {
-        getTargetHost(requestBuilder)
-        applyPreactions(requestBuilder)
-        // Setup global config to request
-        requestBuilder.port = apiConfig.serverPort
+        try {
+            notifyCallStart()
+            getTargetHost(requestBuilder)
+            applyPreactions(requestBuilder)
+            // Setup global config to request
+            requestBuilder.port = apiConfig.serverPort
 
-        val resultCall = client.call(requestBuilder)
-        val response = resultCall.response
-        val status = response.status
-        val packet = response.content.readRemaining(Long.MAX_VALUE)
+            val resultCall = client.call(requestBuilder)
+            val response = resultCall.response
+            val status = response.status
+            val packet = response.content.readRemaining(Long.MAX_VALUE)
 
-        val content = packet.readText()
-        if (!status.isSuccess()) {
-            println("================================")
-            println(response.call.request.url.fullPath)
-            throw ApiCallException("Call api ended with code ${status.value}, content: ${status.description} ${content}")
+            val content = packet.readText()
+            if (!status.isSuccess()) {
+                println("================================")
+                println(response.call.request.url.fullPath)
+                throw ApiCallException("Call api ended with code ${status.value}, content: ${status.description} ${content}")
+            }
+            notifCallSucceeded()
+            return content
+        }catch (ex:Exception){
+            val apiCallException = ApiCallException(ex)
+            notifyCallFail(ex)
+            throw ex
         }
-        return content
     }
 
 
     override suspend fun <T> call(customCaller: CustomCall<T>): T{
-        val baserequest = buildBaseRequest()
-        applyPreactions(baserequest)
-        val result = customCaller.call(baserequest)
-        return result
+        try {
+            notifyCallStart()
+            val baserequest = buildBaseRequest()
+            applyPreactions(baserequest)
+            val result = customCaller.call(baserequest)
+            notifCallSucceeded()
+            return result
+        }catch (ex:Exception){
+            val apiCallException = ApiCallException(ex)
+            notifyCallFail(ex)
+            throw apiCallException
+        }
+
+    }
+
+
+    private fun notifyCallStart(){
+        for (handler in handlers) {
+            handler.onCallStarted()
+        }
+    }
+
+    private fun notifCallSucceeded(){
+        for (handler in handlers) {
+            handler.onCallSucceeded()
+        }
+    }
+    private fun notifyCallFail(throwable: Throwable){
+        for (handler in handlers) {
+            handler.onCallException(throwable)
+        }
     }
 
 
     override fun getApiConfig(): ApiConfig {
         return apiConfig
+    }
+
+    override fun addCallHandler(handler: CallHandler) {
+        handlers.add(handler)
+    }
+
+    override fun removeCallHandler(handler: CallHandler) {
+        handlers.remove(handler)
+    }
+
+    override fun getHandlers(): Set<CallHandler> {
+        return handlers
     }
 
     override fun toString(): String {
