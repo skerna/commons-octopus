@@ -44,7 +44,7 @@ open class DefaultApi(private val apiConfig: ApiConfig,
                           private val defaultClientFactory: ClientFactory) : Api {
     val logger = LoggerFactory.logger<DefaultApi>()
     val client by lazy { defaultClientFactory.create() }
-    val handlers:MutableSet<CallHandler> by lazy { mutableSetOf<CallHandler>() }
+    val handlersSet:MutableSet<CallHandler> = mutableSetOf()
 
     private fun getTargetHost(requestBuilder: HttpRequestBuilder) {
         var host = apiConfig.serverUrl.removeSuffix("/")
@@ -131,18 +131,18 @@ open class DefaultApi(private val apiConfig: ApiConfig,
 
 
     private fun notifyCallStart(){
-        for (handler in handlers) {
+        for (handler in handlersSet) {
             handler.onCallStarted()
         }
     }
 
     private fun notifCallSucceeded(){
-        for (handler in handlers) {
+        for (handler in handlersSet) {
             handler.onCallSucceeded()
         }
     }
     private fun notifyCallFail(throwable: Throwable){
-        for (handler in handlers) {
+        for (handler in handlersSet) {
             handler.onCallException(throwable)
         }
     }
@@ -153,19 +153,19 @@ open class DefaultApi(private val apiConfig: ApiConfig,
     }
 
     override fun addCallHandler(handler: CallHandler) {
-        handlers.add(handler)
+        handlersSet.add(handler)
     }
 
     override fun addCallHandlers(set: Set<CallHandler>) {
-        this.handlers.addAll(set)
+        this.handlersSet.addAll(set)
     }
 
     override fun removeCallHandler(handler: CallHandler) {
-        handlers.remove(handler)
+        handlersSet.remove(handler)
     }
 
     override fun getHandlers(): Set<CallHandler> {
-        return handlers
+        return handlersSet
     }
 
     override fun toString(): String {
