@@ -27,7 +27,6 @@ plugins {
 apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
-
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -87,6 +86,8 @@ repositories{
     maven { url  "https://dl.bintray.com/skerna/maven" }
 }
 kotlin {
+    jvm ()
+    android()
     jvm {
         compilations.main.kotlinOptions {
             jvmTarget = "1.8"
@@ -95,7 +96,7 @@ kotlin {
     targets {
         fromPreset(presets.jvm, 'jvm')
         fromPreset(presets.js, 'js')
-        fromPreset(presets.jvm, 'android')
+        fromPreset(presets.android, 'android')
 
         // For ARM, preset should be changed to presets.iosArm32 or presets.iosArm64
         // For Linux, preset should be changed to e.g. presets.linuxX64
@@ -189,5 +190,111 @@ compileTestKotlinJs {
     kotlinOptions.moduleKind = 'umd'
     kotlinOptions.sourceMapEmbedSources = 'always'
 }
+
+
+def pomConfig = {
+    licenses {
+        license {
+            name 'The Apache Software License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+        }
+    }
+    developers {
+        developer {
+            id 'louiscad'
+            name 'Louis CAD'
+            email 'louis.cognault@gmail.com'
+        }
+    }
+    scm {
+        connection 'https://github.com/LouisCAD/Splitties.git'
+        developerConnection 'https://github.com/LouisCAD/Splitties.git'
+    }
+}
+
+
+
+def publicationNames = []
+publishing.publications {
+    android.libraryVariants.all { variant ->
+        if (variant.buildType.name == "debug") return // Prevents publishing debug library
+
+        def flavored = !variant.flavorName.isEmpty()
+
+        /**
+         * Translates "_" in flavor names to "-" for artifactIds, because "-" in flavor name is an
+         * illegal character, but is well used in artifactId names.
+         */
+        def variantArtifactId = flavored ? variant.flavorName.replace('_', '-') : project.name
+
+        /**
+         * If the javadoc destinationDir wasn't changed per flavor, the libraryVariants would
+         * overwrite the javaDoc as all variants would write in the same directory
+         * before the last javadoc jar would have been built, which would cause the last javadoc
+         * jar to include classes from other flavors that it doesn't include.
+         *
+         * Yes, tricky.
+         *
+         * Note that "${buildDir}/docs/javadoc" is the default javadoc destinationDir.
+         */
+        def javaDocDestDir = file("${buildDir}/docs/javadoc ${flavored ? variantArtifactId : ""}")
+
+        /**
+         * Includes
+         */
+        def sourceDirs = variant.sourceSets.collect {
+            it.javaDirectories // Also includes kotlin sources if any.
+        }
+        def javadoc = task("${variant.name}Javadoc", type: Javadoc) {
+            description "Generates Javadoc for ${variant.name}."
+            source = variant.javaCompile.source // Yes, javaCompile is deprecated,
+            // but I didn't find any working alternative. Please, tweet @Louis_CAD if you find one.
+            destinationDir = javaDocDestDir
+            classpath += files(android.getBootClasspath().join(File.pathSeparator))
+            classpath += files(configurations.compile)
+            options.links("http://docs.oracle.com/javase/7/docs/api/");
+            options.links("http://d.android.com/reference/");
+            exclude '**/BuildConfig.java'
+            exclude '**/R.java'
+            failOnError false
+        }
+        def javadocJar = task("${variant.name}JavadocJar", type: Jar, dependsOn: javadoc) {
+            description "Puts Javadoc for ${variant.name} in a jar."
+            classifier = 'javadoc'
+            from javadoc.destinationDir
+        }
+        def sourcesJar = task("${variant.name}SourcesJar", type: Jar) {
+            description "Puts sources for ${variant.name} in a jar."
+            from sourceDirs
+            classifier = 'sources'
+        }
+
+        def publicationName = "splitties${variant.name.capitalize()}Library"
+        publicationNames.add(publicationName)
+
+        "$publicationName"(MavenPublication) {
+            artifactId "commons-octopus-android"
+            group project.group
+            version project.version
+
+            artifact "build/outputs/aar/commons-octopus-release.aar"
+            artifact sourcesJar
+            artifact javadocJar
+
+            pom {
+                packaging 'aar'
+                withXml {
+                    def dependenciesNode = asNode().appendNode('dependencies')
+                    generatePomDeps(configurations.androidMainImplementation,dependenciesNode)
+                    generatePomDeps(configurations.androidMainApi,dependenciesNode)
+                }
+            }
+        }
+    }
+}
+apply from: project.rootProject.file("gradle/maven-metadata.gradle")
+apply from: project.rootProject.file("gradle/maven-deps.gradle")
 apply from: "./gradle/publish.gradle"
+
+
 

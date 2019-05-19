@@ -25,12 +25,13 @@ package io.skerna.commons.octopus.utils
 import io.skerna.commons.octopus.representations.OAuth2Token
 import java.time.Duration
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 actual object Dates {
     actual fun getExpirationTimeEpoch(token: OAuth2Token): Long {
         val timeout = Calendar.getInstance()
         // Expire from now
-        val expireTimeToMillis = Duration.ofSeconds(token.expires_in).toMillis()
+        val expireTimeToMillis = TimeUnit.SECONDS.toMillis(token.expires_in)
         timeout.timeInMillis = (System.currentTimeMillis() + expireTimeToMillis)
 
         return timeout.timeInMillis

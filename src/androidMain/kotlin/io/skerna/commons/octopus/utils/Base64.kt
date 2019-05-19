@@ -22,16 +22,24 @@
 
 package io.skerna.commons.octopus.utils
 
-import java.nio.charset.StandardCharsets
-import java.util.Base64
-
+import android.os.Build
+import kotlinx.serialization.toUtf8Bytes
 actual object Base64 {
     actual fun encode(source: String): String {
-        return Base64.getEncoder().encodeToString(source.toByteArray(Charsets.UTF_8))
+        val data = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return android.util.Base64.encodeToString(source.toUtf8Bytes(), android.util.Base64.NO_WRAP) // Unresolved reference: decode
+        } else {
+            return android.util.Base64.encodeToString(source.toUtf8Bytes(), android.util.Base64.NO_WRAP) // Unresolved reference: decode
+        }
     }
 
     actual fun decode(source: String): String {
-        val bytes =  Base64.getDecoder().decode(source)
-        return String(bytes,StandardCharsets.UTF_8)
+        val data = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val bytes=  android.util.Base64.decode(source, android.util.Base64.NO_WRAP) // Unresolved reference: decode
+            return String(bytes)
+        } else {
+            val bytes=  android.util.Base64.decode(source, android.util.Base64.NO_WRAP) // Unresolved reference: decode
+            return String(bytes)
+        }
     }
 }
