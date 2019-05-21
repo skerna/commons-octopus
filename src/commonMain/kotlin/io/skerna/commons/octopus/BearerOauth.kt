@@ -75,7 +75,7 @@ class BearerOauth(val tokenEncoded: String) : Preaction {
      * @param
      */
     private suspend fun resolveToken(context: PreactionContext): OAuth2Token {
-        return if (currentTokenIsValid()) {
+        return if (currentTokenIsInValid()) {
             log.debug("Current token es invalido")
             val tokenOperation = resolveRemoteToken(context)
             this.currentToken = tokenOperation
@@ -124,10 +124,8 @@ class BearerOauth(val tokenEncoded: String) : Preaction {
         return JSON.parse(OAuth2Token.serializer(), content)
     }
 
-    private fun currentTokenIsValid(): Boolean {
-        if (this.currentToken == null) {
-            return true
-        } else return !currentTokenIsExpired()
+    private fun currentTokenIsInValid(): Boolean {
+        return this.currentToken == null || currentTokenIsExpired()
     }
 
     private fun currentTokenIsExpired(): Boolean {
